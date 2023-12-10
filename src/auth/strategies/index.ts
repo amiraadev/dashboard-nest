@@ -1,2 +1,2 @@
 /* eslint-disable prettier/prettier */
-export * from './tokens.type';
+export * from './at.strategy';
