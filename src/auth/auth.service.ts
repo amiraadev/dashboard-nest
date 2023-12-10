@@ -30,6 +30,10 @@ export class AuthService {
         { secret: 'rt-secret', expiresIn: 60 * 60 * 24 * 7 },
       ),
     ]);
+    return {
+      access_token: at,
+      refresh_token: rt,
+    };
   }
   async signupLocal(dto: AuthDto) {
     const existingUser = await this.prisma.user.findUnique({
@@ -45,13 +49,14 @@ export class AuthService {
     }
     const hash = await this.hashData(dto.password);
 
-    const createdUser = await this.prisma.user.create({
+    const newUser = await this.prisma.user.create({
       data: {
         email: dto.email,
         hash: hash,
       },
     });
-    return createdUser;
+    const tokens = await this.getTokens(newUser.id, newUser.email);
+    return tokens;
   }
   signinLocal() {}
   logout() {}
