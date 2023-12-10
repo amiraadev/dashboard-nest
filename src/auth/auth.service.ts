@@ -6,16 +6,20 @@ import { AuthDto } from './dto';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
   async signupLocal(dto: AuthDto) {
-    const existingUser = this.prisma.user.findUnique({
-      where: dto.email,
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
     });
+
     if (existingUser) {
       throw new NotFoundException(
         'This email is already in use. Please choose another.',
       );
     }
+
     const createdUser = await this.prisma.user.create({
-      data: dto,
+      data: { ...dto },
     });
     return createdUser;
   }
