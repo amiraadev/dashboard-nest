@@ -11,8 +11,8 @@ export class AuthController {
     return this.authService.signupLocal(dto);
   }
   @Post('/local/signin')
-  signinLocal() {
-    this.authService.signinLocal;
+  signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
+    return this.authService.signinLocal(dto);
   }
   @Post('/logout')
   logout() {
