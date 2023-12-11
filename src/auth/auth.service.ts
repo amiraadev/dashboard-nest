@@ -10,6 +10,35 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
+  async signupLocal(dto: AuthDto) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (existingUser) {
+      throw new NotFoundException(
+        'This email is already in use. Please choose another.',
+      );
+    }
+    const hash = await this.hashData(dto.password);
+
+    const newUser = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        hash: hash,
+      },
+    });
+    const tokens = await this.getTokens(newUser.id, newUser.email);
+    await this.updateRtHash(newUser.id, tokens.refresh_token);
+    return tokens;
+  }
+
+  signinLocal() {}
+  logout() {}
+  refreshTokens() {}
+
   hashData(data: string) {
     return bcrypt.hash(data, 10);
   }
@@ -35,30 +64,16 @@ export class AuthService {
       refresh_token: rt,
     };
   }
-  async signupLocal(dto: AuthDto) {
-    const existingUser = await this.prisma.user.findUnique({
+
+  async updateRtHash(userId: number, refreshToken: string) {
+    const hash = await this.hashData(refreshToken);
+    await this.prisma.user.update({
       where: {
-        email: dto.email,
+        id: userId,
       },
-    });
-
-    if (existingUser) {
-      throw new NotFoundException(
-        'This email is already in use. Please choose another.',
-      );
-    }
-    const hash = await this.hashData(dto.password);
-
-    const newUser = await this.prisma.user.create({
       data: {
-        email: dto.email,
-        hash: hash,
+        hashedRt: hash,
       },
     });
-    const tokens = await this.getTokens(newUser.id, newUser.email);
-    return tokens;
   }
-  signinLocal() {}
-  logout() {}
-  refreshTokens() {}
 }
