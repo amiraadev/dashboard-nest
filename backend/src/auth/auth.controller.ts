@@ -18,7 +18,8 @@ import { GetCurrentUser } from 'src/common/decorators';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-  @Post('local/signup')
+  
+  @Post('register')
   @HttpCode(HttpStatus.CREATED)
   signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
     return this.authService.signupLocal(dto);
