@@ -1,10 +1,15 @@
-version: '3'
+version: '3.8'
 services:
-  db:
-    image: postgres:13
+  mysql:
+    image: mysql
+    container_name: mysql
+    restart: always
     ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: nestjs_auth
+      - 3307:3306
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

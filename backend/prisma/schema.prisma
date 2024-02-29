@@ -6,18 +6,98 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                     Int                @id @default(autoincrement())
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @default(now())
+  id             String   @id @default(uuid())
+  firstName      String
+  lastName       String
+  email          String   @unique
+  hashedPassword String
+  picturePath    String?
+  location       String?
+  occupation     String?
+  viewedProfile  Int      @default(0)
+  impressions    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  email                  String             @unique()
-  hash                   String            
-  hashedRt               String?             
+  friends  Friend[]
+  posts    Post[]
+  Likes    Like[]
+  Comments Comment[]
+  picture  Image?    @relation(fields: [picturePath], references: [path])
+}
 
-  @@map("users")
+model Friend {
+  id          String  @id @default(uuid())
+  userId      String
+  firstName   String
+  lastName    String
+  picturePath String?
+  occupation  String?
+  location    String?
+
+  user  User   @relation(fields: [userId], references: [id])
+  Image Image? @relation(fields: [picturePath], references: [path])
+}
+
+model Post {
+  id              String @id @default(uuid())
+  userId          String
+  firstName       String
+  lastName        String
+  location        String
+  description     String
+  userpicturePath String
+  picturePath     String
+
+  likes    Like[]
+  Comments Comment[]
+  user     User      @relation(fields: [userId], references: [id])
+
+  // postPictures Image[] @relation("postPicture")
+  // userPicture  Image?  @relation("picturePath", fields: [picturePath], references: [path])
+
+  postPictures    Image[] @relation("postPicture")
+  PostUserPicture Image?  @relation("picturePath", fields: [picturePath], references: [path])
+}
+
+model Image {
+  id     String   @id @default(uuid())
+  path   String   @unique
+  postId String
+  userId String
+  Friend Friend[]
+  User   User[]
+
+  // Post  Post?  @relation("postPicture", fields: [postId], references: [id])
+  // posts Post[] @relation("picturePath")
+
+  postsOfThisPicture Post[] @relation("postPicture")
+  postsOfThisUserPicture Post[] @relation("picturePath")
+}
+
+model Like {
+  id     String @id @default(uuid())
+  postId String
+  userId String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // A user can like a post just one time 
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
 }
