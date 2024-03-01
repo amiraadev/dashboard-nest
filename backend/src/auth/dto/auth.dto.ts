@@ -29,7 +29,6 @@ export class SignInDto {
   @IsEmail()
   email: string;
 
-  @Min(6)
   @IsNotEmpty()
   @IsString()
   password: string;
