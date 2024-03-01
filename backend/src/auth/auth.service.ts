@@ -16,9 +16,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signupLocal(dto: SignUpDto) {
-    console.log("hello");
-    
+  async signupLocal(dto: SignUpDto) {    
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [
@@ -40,6 +38,11 @@ export class AuthService {
       data: {
        ...dtoWithoutPassword,
        hashedPassword: hash,
+      },
+    });
+    const newImage = await this.prisma.image.create({
+      data: {
+       path: dto.picturePath,
       },
     });
 

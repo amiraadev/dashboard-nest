@@ -69,8 +69,8 @@ model Post {
 model Image {
   id     String   @id @default(uuid())
   path   String   @unique
-  postId String
-  userId String
+  postId String?
+  userId String?
   Friend Friend[]
   User   User[]
 
