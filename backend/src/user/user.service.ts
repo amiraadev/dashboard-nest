@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  
-  constructor(private readonly userService: UserService) {}
+
+  constructor(private readonly userService: PrismaService) {}
 
   getUserById(id: string){
+    const user = this.userService.findUniqueUserById(id);
   }
 
 
