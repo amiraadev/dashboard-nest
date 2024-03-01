@@ -17,6 +17,21 @@ export class AuthService {
   ) {}
 
   async signupLocal(dto: SignUpDto) {
+    if (dto.picturePath) {
+      const existingImage = await this.prisma.image.findUnique({
+        where: {
+         path:dto.picturePath
+        },
+      });
+      if(!existingImage) {
+        await this.prisma.image.create({
+          data: {
+            path: dto.picturePath,
+          },
+        });
+      }
+    }
+    
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [
@@ -41,20 +56,7 @@ export class AuthService {
       },
     });
 
-    if (dto.picturePath) {
-      const existingImage = await this.prisma.image.findUnique({
-        where: {
-         path:dto.picturePath
-        },
-      });
-      if(!existingImage) {
-        await this.prisma.image.create({
-          data: {
-            path: dto.picturePath,
-          },
-        });
-      }
-    }
+   
 
     const tokens = await this.getTokens(newUser.id, newUser.email);
     await this.updateRtHash(newUser.id, tokens.refresh_token);
