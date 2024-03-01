@@ -21,7 +21,7 @@ export class UserController {
   @UseGuards(AtGuard)
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
-  getUserById(id: string): UserDto {
+  getUserById(@Param('id') id: string): Promise<UserDto> {
     return this.userService.getUserById(id);
   }
 
