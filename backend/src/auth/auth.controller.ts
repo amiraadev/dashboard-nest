@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -8,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {  SignInDto, SignUpDto } from './dto';
+import { SignInDto, SignUpDto } from './dto';
 import { Tokens } from './types';
 import { Request } from 'express';
 import { AtGuard, RtGuard } from 'src/common/decorators/guards';
@@ -24,7 +25,6 @@ export class AuthController {
     return this.authService.signupLocal(dto);
   }
 
-
   @Post('login')
   @HttpCode(HttpStatus.OK)
   signinLocal(@Body() dto: SignInDto): Promise<Tokens> {
@@ -36,8 +36,8 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUser('sub') userId: number) {
-    console.log("gdfr");
-    
+    console.log('gdfr');
+
     // return this.authService.logout(userId);
   }
 
