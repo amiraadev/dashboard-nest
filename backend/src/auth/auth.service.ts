@@ -16,7 +16,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signupLocal(dto: SignUpDto) {    
+  async signupLocal(dto: SignUpDto) {
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [
@@ -36,15 +36,25 @@ export class AuthService {
 
     const newUser = await this.prisma.user.create({
       data: {
-       ...dtoWithoutPassword,
-       hashedPassword: hash,
+        ...dtoWithoutPassword,
+        hashedPassword: hash,
       },
     });
-    const newImage = await this.prisma.image.create({
-      data: {
-       path: dto.picturePath,
-      },
-    });
+
+    if (dto.picturePath) {
+      const existingImage = await this.prisma.image.findUnique({
+        where: {
+         path:dto.picturePath
+        },
+      });
+      if(!existingImage) {
+        await this.prisma.image.create({
+          data: {
+            path: dto.picturePath,
+          },
+        });
+      }
+    }
 
     const tokens = await this.getTokens(newUser.id, newUser.email);
     await this.updateRtHash(newUser.id, tokens.refresh_token);
@@ -62,7 +72,10 @@ export class AuthService {
       throw new ForbiddenException('Access Denied !');
     }
 
-    const passwordMatch = await bcrypt.compare(dto.password, user.hashedPassword);
+    const passwordMatch = await bcrypt.compare(
+      dto.password,
+      user.hashedPassword,
+    );
 
     if (!passwordMatch) {
       throw new ForbiddenException('Access Denied !');
@@ -100,7 +113,7 @@ export class AuthService {
   hashData(data: string) {
     return bcrypt.hash(data, 10);
   }
-  
+
   async getTokens(userId: string, email: string) {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
