@@ -4,12 +4,12 @@ import { FilesService } from './files.service';
 import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
-  imports:[
-MulterModule.register({
-  dest:'./uploads'
-})
+  imports: [
+    MulterModule.register({
+      dest: './uploads',
+    }),
   ],
   controllers: [FilesController],
-  providers: [FilesService]
+  providers: [FilesService],
 })
 export class FilesModule {}
