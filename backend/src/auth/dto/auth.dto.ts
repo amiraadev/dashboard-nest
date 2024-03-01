@@ -24,7 +24,7 @@ export class SignUpDto {
   location?: string;
   occupation?: string;
 }
-export class SignInpDto {
+export class SignInDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()

@@ -8,9 +8,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
+import {  SignInDto, SignUpDto } from './dto';
 import { Tokens } from './types';
-// import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { AtGuard, RtGuard } from 'src/common/decorators/guards';
 import { GetCurrentUser } from 'src/common/decorators';
@@ -18,15 +17,17 @@ import { GetCurrentUser } from 'src/common/decorators';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-  
+
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
+  signupLocal(@Body() dto: SignUpDto): Promise<Tokens> {
     return this.authService.signupLocal(dto);
   }
-  @Post('local/signin')
+
+
+  @Post('login')
   @HttpCode(HttpStatus.OK)
-  signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
+  signinLocal(@Body() dto: SignInDto): Promise<Tokens> {
     return this.authService.signinLocal(dto);
   }
 
@@ -35,7 +36,9 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUser('sub') userId: number) {
-    return this.authService.logout(userId);
+    console.log("gdfr");
+    
+    // return this.authService.logout(userId);
   }
 
   // @UseGuards(AuthGuard('jwt-refresh'))

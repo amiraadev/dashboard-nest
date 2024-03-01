@@ -15,7 +15,8 @@ model User {
   firstName      String
   lastName       String
   email          String   @unique
-  hashedPassword String
+  hashedPassword String?
+  hashedRefToken String   @default("")
   picturePath    String?
   location       String?
   occupation     String?

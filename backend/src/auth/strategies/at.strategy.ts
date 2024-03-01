@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
