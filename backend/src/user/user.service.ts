@@ -83,6 +83,18 @@ export class UserService {
       const addedFriend = await this.prisma.friend.create({
         data: friendToAdd,
       });
+      const userToAdd = {
+        id: user.id,
+        userId: addedFriend.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        picturePath: user.picturePath,
+        occupation: user.occupation,
+        location: user.location,
+      }
+      await this.prisma.friend.create({
+        data: userToAdd,
+      });
       console.log(
         `${addedFriend.firstName} ${addedFriend.lastName} has been added to the friend's list of ${user.firstName} ${user.lastName}`,
       );
@@ -93,6 +105,13 @@ export class UserService {
       where: {
         id: friendId,
         userId: id,
+      },
+    });
+
+    await this.prisma.friend.delete({
+      where: {
+        id: id,
+        userId: friendId,
       },
     });
     console.log(

@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Tokens } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Image } from 'src/posts/dto/post.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,19 +18,22 @@ export class AuthService {
   ) {}
 
   async signupLocal(dto: SignUpDto) {
+    let image: Image | null = null;
     if (dto.picturePath) {
+
       const existingImage = await this.prisma.image.findUnique({
         where: {
          path:dto.picturePath
         },
       });
+
       if(!existingImage) {
-        await this.prisma.image.create({
+        image = await this.prisma.image.create({
           data: {
             path: dto.picturePath,
           },
         });
-      }
+      }   
     }
     
     const existingUser = await this.prisma.user.findFirst({
@@ -56,7 +60,12 @@ export class AuthService {
       },
     });
 
-   
+    if (image) {
+       await this.prisma.image.update({
+         where: { id: image.id },
+         data: { userId: newUser.id },
+       });    
+     }
 
     const tokens = await this.getTokens(newUser.id, newUser.email);
     await this.updateRtHash(newUser.id, tokens.refresh_token);
