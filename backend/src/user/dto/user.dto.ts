@@ -29,3 +29,9 @@ export class UserDto {
     occupation?:string,
     location?: string,
   }
+  export interface ReqUser {
+    sub: string;
+    email?: string; // Optional property
+    iat?: number; // Optional property
+    exp?: number; // Optional property
+  }
