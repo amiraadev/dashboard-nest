@@ -48,14 +48,13 @@ model Friend {
 }
 
 model Post {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   userId          String
-  firstName       String
-  lastName        String
-  location        String
+  title           String
   description     String
-  userpicturePath String
-  picturePath     String
+  location        String?
+  userpicturePath String?
+  picturePath     String?
 
   likes    Like[]
   Comments Comment[]
@@ -79,7 +78,7 @@ model Image {
   // Post  Post?  @relation("postPicture", fields: [postId], references: [id])
   // posts Post[] @relation("picturePath")
 
-  postsOfThisPicture Post[] @relation("postPicture")
+  postsOfThisPicture     Post[] @relation("postPicture")
   postsOfThisUserPicture Post[] @relation("picturePath")
 }
 
