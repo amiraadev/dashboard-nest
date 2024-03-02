@@ -9,6 +9,7 @@ import {
   Req,
   Body,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Friend, ReqUser, User, updatedUserData } from './dto/user.dto';
@@ -52,5 +53,16 @@ export class UserController {
   ): Promise<updatedUserData> {
     const userId = req.user.sub;
     return this.userService.updateUserData(userId,newUserData);
+  }
+
+
+  @UseGuards(AtGuard)
+  @Delete('delete')
+  @HttpCode(HttpStatus.OK)
+  DeleteUser(
+    @Req() req: Request & { user: ReqUser }
+  ): Promise<updatedUserData> {
+    const userId = req.user.sub;
+    return this.userService.DeleteUser(userId);
   }
 }

@@ -161,4 +161,24 @@ export class UserService {
       throw new InternalServerErrorException('Failed to update user');
     }
   }
+
+  async DeleteUser(userId: string):Promise<updatedUserData>{
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    try {  
+      const deletedUser = this.prisma.user.delete({
+        where:{id:userId}
+      })
+      return deletedUser
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
 }
