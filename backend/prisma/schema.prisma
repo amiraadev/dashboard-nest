@@ -75,11 +75,11 @@ model Image {
   Friend Friend[]
   User   User[]
 
-  // Post  Post?  @relation("postPicture", fields: [postId], references: [id])
-  // posts Post[] @relation("picturePath")
+  Post  Post?  @relation("postPicture", fields: [postId], references: [id])
+  posts Post[] @relation("picturePath")
 
-  postsOfThisPicture     Post[] @relation("postPicture")
-  postsOfThisUserPicture Post[] @relation("picturePath")
+  // postsOfThisPicture     Post[] @relation("postPicture")
+  // postsOfThisUserPicture Post[] @relation("picturePath")
 }
 
 model Like {
