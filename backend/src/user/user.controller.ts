@@ -11,7 +11,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto/user.dto';
+import { Friend, User, UserDto } from './dto/user.dto';
 import { AtGuard } from 'src/common/decorators/guards';
 
 @Controller('user')
@@ -21,8 +21,14 @@ export class UserController {
   @UseGuards(AtGuard)
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
-  getUserById(@Param('id') id: string): Promise<UserDto> {
+  getUserById(@Param('id') id: string): Promise<User> {
     return this.userService.getUserById(id);
+  }
+  @UseGuards(AtGuard)
+  @Get('/:id/friends')
+  @HttpCode(HttpStatus.OK)
+  getUserFriends(@Param('id') id: string):  Promise<Friend[]> {
+    return this.userService.getUserFriends(id);
   }
 
   @Post()

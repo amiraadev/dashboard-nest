@@ -30,6 +30,8 @@ model User {
   Likes    Like[]
   Comments Comment[]
   picture  Image?    @relation(fields: [picturePath], references: [path])
+
+  @@unique([firstName, lastName])
 }
 
 model Friend {
