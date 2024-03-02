@@ -8,12 +8,12 @@ import {
   HttpStatus,
   Req,
   Body,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Friend, ReqUser, User } from './dto/user.dto';
+import { Friend, ReqUser, User, updatedUserData } from './dto/user.dto';
 import { AtGuard } from 'src/common/decorators/guards';
 import { Request } from 'express';
-import { SignUpDto } from 'src/auth/dto';
 
 @Controller('user')
 export class UserController {
@@ -44,13 +44,13 @@ export class UserController {
     return this.userService.addRemoveFriend(userId, friendId);
   }
   @UseGuards(AtGuard)
-  @Post('update')
+  @Patch('update')
   @HttpCode(HttpStatus.OK)
-  updateFriend(
+  updateUserData(
     @Req() req: Request & { user: ReqUser },
-    @Body() updatedUser:SignUpDto
-  ): Promise<User> {
+    @Body() newUserData:updatedUserData
+  ): Promise<updatedUserData> {
     const userId = req.user.sub;
-    return this.userService.updateFriend(userId,updatedUser);
+    return this.userService.updateUserData(userId,newUserData);
   }
 }

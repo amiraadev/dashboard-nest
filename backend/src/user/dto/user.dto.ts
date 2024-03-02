@@ -9,6 +9,14 @@ export class UserDto {
     impressions:number;
   }
 
+  export class updatedUserData {
+    firstName?: string;
+    lastName?: string;
+    picturePath?: string;
+    location?: string;
+    occupation?: string;
+  }
+
   export interface User {
     id: string,
     firstName: string,

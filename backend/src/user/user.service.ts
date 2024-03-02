@@ -1,7 +1,10 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Friend, User } from './dto/user.dto';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { Friend, User, updatedUserData } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SignUpDto } from 'src/auth/dto';
 
 @Injectable()
 export class UserService {
@@ -43,8 +46,6 @@ export class UserService {
 
     return friends;
   }
-
-
 
   async addRemoveFriend(id: string, friendId: string): Promise<Friend> {
     const user = await this.prisma.user.findUnique({
@@ -94,7 +95,7 @@ export class UserService {
         picturePath: user.picturePath,
         occupation: user.occupation,
         location: user.location,
-      }
+      };
       await this.prisma.friend.create({
         data: userToAdd,
       });
@@ -123,35 +124,41 @@ export class UserService {
     return removedFriend;
   }
 
-
-
-  async updateFriend(userId: string,updatedUser:SignUpDto): Promise<User> {
+  async updateUserData(
+    userId: string,
+    newUserData: updatedUserData,
+  ): Promise<updatedUserData> {
     const user = await this.prisma.user.findUnique({
-      where:{
+      where: {
         id: userId,
-      }
-    })
-    if (!user){
+      },
+    });
+    if (!user) {
       throw new NotFoundException('User not found');
     }
-  try {
-    const updatedUserData = {
-      ...user,
-      ...updatedUser, 
-    };
+    if (!newUserData) {
+      throw new NotFoundException('Nothing to update');
+    }
+    try {
+      const updatedUserData = {
+        ...user,
+        ...newUserData,
+      };
 
-    const UpdatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: updatedUserData,
-    });
-
-    return UpdatedUser;
-  } catch (error) {
-    throw new InternalServerErrorException('Failed to update user');
+      const updatedUser = await this.prisma.user.update({
+        where: { id: userId },
+        data: updatedUserData,
+      });
+      const returnedUpdatedUser = {
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        picturePath: updatedUser.picturePath,
+        location: updatedUser.location,
+        occupation: updatedUser.occupation,
+      };
+      return returnedUpdatedUser;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to update user');
+    }
   }
- 
-
-
-  }
-
 }
