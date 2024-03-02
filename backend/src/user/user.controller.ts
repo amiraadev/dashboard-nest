@@ -19,7 +19,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(AtGuard)
-  @Get('/:id')
+  @Get('/:id/details')
   @HttpCode(HttpStatus.OK)
   getUserById(@Param('id') id: string): Promise<User> {
     return this.userService.getUserById(id);
