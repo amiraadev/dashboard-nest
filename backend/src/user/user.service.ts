@@ -43,7 +43,7 @@ export class UserService {
     return friends;
   }
 
-  
+
   async addRemoveFriend(id: string, friendId: string): Promise<Friend> {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -66,9 +66,12 @@ export class UserService {
       .friends();
 
     const friendExist = userFriends.find((frd) => {
-      frd.id === friendId;
+      return frd.id === friendId;
     });
+    
     if (!friendExist) {
+      console.log("this friend does not exist in the friend's list");
+      
       const friendToAdd = {
         id: friend.id,
         userId: user.id,
@@ -86,6 +89,7 @@ export class UserService {
       );
       return addedFriend;
     }
+
     const removedFriend = await this.prisma.friend.delete({
       where: {
         id: friendId,
