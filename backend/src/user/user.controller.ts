@@ -25,10 +25,11 @@ export class UserController {
     return this.userService.getUserById(id);
   }
   @UseGuards(AtGuard)
-  @Get('/:id/friends')
+  @Get('/friends')
   @HttpCode(HttpStatus.OK)
-  getUserFriends(@Param('id') id: string): Promise<Friend[]> {
-    return this.userService.getUserFriends(id);
+  getUserFriends( @Req() req: Request & { user: ReqUser }): Promise<Friend[]> {
+    const userId = req.user.sub;
+    return this.userService.getUserFriends(userId);
   }
 
   @UseGuards(AtGuard)
