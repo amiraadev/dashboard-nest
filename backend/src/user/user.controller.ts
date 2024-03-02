@@ -7,11 +7,13 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Friend, ReqUser, User } from './dto/user.dto';
 import { AtGuard } from 'src/common/decorators/guards';
 import { Request } from 'express';
+import { SignUpDto } from 'src/auth/dto';
 
 @Controller('user')
 export class UserController {
@@ -40,5 +42,15 @@ export class UserController {
   ): Promise<Friend> {
     const userId = req.user.sub;
     return this.userService.addRemoveFriend(userId, friendId);
+  }
+  @UseGuards(AtGuard)
+  @Post('update')
+  @HttpCode(HttpStatus.OK)
+  updateFriend(
+    @Req() req: Request & { user: ReqUser },
+    @Body() updatedUser:SignUpDto
+  ): Promise<User> {
+    const userId = req.user.sub;
+    return this.userService.updateFriend(userId,updatedUser);
   }
 }

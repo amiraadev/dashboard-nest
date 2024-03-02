@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Friend, User } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SignUpDto } from 'src/auth/dto';
 
 @Injectable()
 export class UserService {
@@ -42,6 +43,8 @@ export class UserService {
 
     return friends;
   }
+
+
 
   async addRemoveFriend(id: string, friendId: string): Promise<Friend> {
     const user = await this.prisma.user.findUnique({
@@ -119,4 +122,36 @@ export class UserService {
     );
     return removedFriend;
   }
+
+
+
+  async updateFriend(userId: string,updatedUser:SignUpDto): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where:{
+        id: userId,
+      }
+    })
+    if (!user){
+      throw new NotFoundException('User not found');
+    }
+  try {
+    const updatedUserData = {
+      ...user,
+      ...updatedUser, 
+    };
+
+    const UpdatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: updatedUserData,
+    });
+
+    return UpdatedUser;
+  } catch (error) {
+    throw new InternalServerErrorException('Failed to update user');
+  }
+ 
+
+
+  }
+
 }
