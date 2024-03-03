@@ -149,12 +149,15 @@ export class UserService {
         where: { id: userId },
         data: updatedUserData,
       });
+      const updatedUserLocation = updatedUser.location || null;
+      const updatedUserPicturePath = updatedUser.picturePath || null;
+      const updatedUserOccupation = updatedUser.occupation || null;
       const returnedUpdatedUser = {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
-        picturePath: updatedUser.picturePath,
-        location: updatedUser.location,
-        occupation: updatedUser.occupation,
+        picturePath: updatedUserPicturePath,
+        location: updatedUserLocation,
+        occupation: updatedUserOccupation,
       };
       return returnedUpdatedUser;
     } catch (error) {

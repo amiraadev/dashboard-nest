@@ -7,7 +7,16 @@ declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      // transformOptions: {
+      //   enableImplicitConversion: true,
+      // },
+    }),
+  );
+
   // app.use(helmet());
   // app.enableCors();
   await app.listen(5005);
