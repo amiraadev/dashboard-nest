@@ -31,13 +31,45 @@ export class PostsService {
     });
 
     if (image) {
-     const updatedImg= await this.prisma.image.update({
+      const updatedImg = await this.prisma.image.update({
         where: { id: image.id },
         data: { postId: createdPost.id },
       });
-      console.log(updatedImg);
-      
+      console.log("updated image" + updatedImg);
     }
     return createdPost;
+  }
+
+  async deletePost(userId: string, postId: string): Promise<CreatedPost> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+    if (!post) {
+      throw new NotFoundException('User not found');
+    }
+    try {
+      const deletedPost = await this.prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      });
+      return {
+        id: deletedPost.id,
+        userId: deletedPost.userId,
+        title: deletedPost.title,
+        description: deletedPost.description,
+        location: deletedPost.location,
+        picturePath: deletedPost.picturePath,
+        userpicturePath: deletedPost.userpicturePath,
+      };
+    } catch (error) {
+      console.log('DELETE POST ERROR: ' + error);
+    }
   }
 }

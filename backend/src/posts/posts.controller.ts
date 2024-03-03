@@ -19,5 +19,14 @@ export class PostsController {
     return this.postsService.createPost(postToBeCreated);
   }
 
+
+  @UseGuards(AtGuard)
+  @Delete("delete/:postId")
+  @HttpCode(HttpStatus.OK)
+  deletePost( @Req() req: Request & { user: ReqUser },@Param("postId") postId:string ): Promise<CreatedPost> {
+   const userId = req.user.sub
+    return this.postsService.deletePost(userId,postId);
+  }
+
   
 }
