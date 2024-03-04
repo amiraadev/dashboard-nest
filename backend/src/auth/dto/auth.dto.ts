@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, Length } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, Length, IsOptional } from 'class-validator';
 
 export class SignUpDto {
   @Length(2, 50)
@@ -18,9 +18,11 @@ export class SignUpDto {
   @IsNotEmpty()
   @IsString()
   password: string;
-
+  @IsOptional()
   picturePath?: string;
+  @IsOptional()
   location?: string;
+  @IsOptional()
   occupation?: string;
 }
 export class SignInDto {

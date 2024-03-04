@@ -36,6 +36,7 @@ model User {
 
 model Friend {
   id          String  @id @default(uuid())
+  friendId     String
   userId      String
   firstName   String
   lastName    String
@@ -45,6 +46,8 @@ model Friend {
 
   user  User   @relation(fields: [userId], references: [id])
   Image Image? @relation(fields: [picturePath], references: [path])
+
+  @@unique([friendId, userId])
 }
 
 model Post {

@@ -58,8 +58,10 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('User not found');
     }
-    if(post.userId !== userId) {
-      throw new ForbiddenException('Only the original author can delete his content!')
+    if (post.userId !== userId) {
+      throw new ForbiddenException(
+        'Only the original author can delete his content!',
+      );
     }
     try {
       const deletedPost = await this.prisma.post.delete({
@@ -98,25 +100,25 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    if(post.userId !== userId) {
-      throw new ForbiddenException('Only the original author can edit his content!')
+    if (post.userId !== userId) {
+      throw new ForbiddenException(
+        'Only the original author can edit his content!',
+      );
     }
     console.log(newPostData);
-    
-    if (Object.keys(newPostData).length === 0 ) {
+
+    if (Object.keys(newPostData).length === 0) {
       throw new NotFoundException('Nothing to update');
     }
     try {
-
-      if(newPostData.picturePath){
+      if (newPostData.picturePath) {
         const updatedImg = await this.prisma.image.update({
-          where:{
-            path:post.picturePath
+          where: {
+            path: post.picturePath,
           },
-          data:{path:newPostData.picturePath}
-        })
-        console.log("Updated Image" + updatedImg.path);
-        
+          data: { path: newPostData.picturePath },
+        });
+        console.log('Updated Image' + updatedImg.path);
       }
 
       const updatedPostData = {
@@ -128,7 +130,7 @@ export class PostsService {
         where: { id: postId },
         data: updatedPostData,
       });
- 
+
       const returnedUpdatedPost = {
         id: updatedPost.id,
         userId: updatedPost.userId,
@@ -145,4 +147,49 @@ export class PostsService {
       throw new InternalServerErrorException('Failed to update user');
     }
   }
+
+  async getPostById(userId, postId): Promise<PostType> {
+    const [user, post] = await this.prisma.$transaction([
+      this.prisma.user.findUnique({
+        where: { id: userId },
+      }),
+      this.prisma.post.findUnique({
+        where: { id: postId },
+      }),
+    ]);
+
+    // Throw errors upfront if user or post not found
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    return post;
+  }
+
+  async getPostsByUser(userId): Promise<PostType[]> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const posts = await this.prisma.post.findMany({
+      where: { userId: userId },
+    });
+    return posts;
+  }
+  async getAllPosts(userId): Promise<PostType[]> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const posts = await this.prisma.post.findMany();
+    return posts;
+  }
+
+  
 }

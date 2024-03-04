@@ -38,90 +38,64 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    const friends = await this.prisma.user
-      .findUnique({
-        where: { id: id },
-      })
-      .friends();
+    // const friends = await this.prisma.user
+    //   .findUnique({
+    //     where: { id: id },
+    //   })
+    //   .friends();
+    const friends = await this.prisma.friend.findMany({
+      include: { user: true },
+    });
 
     return friends;
   }
 
-  async addRemoveFriend(id: string, friendId: string): Promise<Friend> {
-    const user = await this.prisma.user.findUnique({
+  // async addRemoveFriend(id: string, friendId: string): Promise<Friend> {
+  async addRemoveFriend(id: string, friendId: string) {
+    // await this.prisma.friend.deleteMany({});
+
+    const [user, friend] = await Promise.all([
+      this.prisma.user.findUnique({ where: { id } }),
+      this.prisma.user.findUnique({ where: { id: friendId } }), // Use `friend.findUnique`
+    ]);
+    if (!user || !friend) {
+      if (!friend) {
+        throw new NotFoundException('Friend not found'); // Specific error message
+      } else {
+        throw new NotFoundException('User not found');
+      }
+    }
+    const existingFriend = await this.prisma.user.findUnique({
       where: { id },
+      select: { friends: { where: {  friendId } } },
     });
-    if (!user) {
-      throw new NotFoundException('User not found');
+
+    if (existingFriend.friends.length === 0) {
+     const addedFriend = await this.prisma.friend.create({
+        data: {
+          friendId,
+          userId: id,
+          firstName: friend.firstName,
+          lastName: friend.lastName,
+          picturePath: friend.picturePath,
+          occupation: friend.occupation,
+          location: friend.location,
+        },
+      });
+      console.log("friend added successfully");
+      
+      return addedFriend
     }
-    const friend = await this.prisma.user.findUnique({
-      where: { id: friendId },
-    });
-    if (!friend) {
-      throw new NotFoundException(
-        'there is no such a friend subscribed in this platform!',
-      );
-    }
-    const userFriends = await this.prisma.user
-      .findUnique({
-        where: { id: id },
+    else {
+      const deletedFriend = await this.prisma.friend.deleteMany({
+        where:{
+          AND:[{ friendId}, { userId: id }]
+        },
       })
-      .friends();
+      console.log("friend deleted successfully");
 
-    const friendExist = userFriends.find((frd) => {
-      return frd.id === friendId;
-    });
-
-    if (!friendExist) {
-      console.log("this friend does not exist in the friend's list");
-
-      const friendToAdd = {
-        id: friend.id,
-        userId: user.id,
-        firstName: friend.firstName,
-        lastName: friend.lastName,
-        picturePath: friend.picturePath,
-        occupation: friend.occupation,
-        location: friend.location,
-      };
-      const addedFriend = await this.prisma.friend.create({
-        data: friendToAdd,
-      });
-      const userToAdd = {
-        id: user.id,
-        userId: addedFriend.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        picturePath: user.picturePath,
-        occupation: user.occupation,
-        location: user.location,
-      };
-      await this.prisma.friend.create({
-        data: userToAdd,
-      });
-      console.log(
-        `${addedFriend.firstName} ${addedFriend.lastName} has been added to the friend's list of ${user.firstName} ${user.lastName}`,
-      );
-      return addedFriend;
+      return deletedFriend
     }
-
-    const removedFriend = await this.prisma.friend.delete({
-      where: {
-        id: friendId,
-        userId: id,
-      },
-    });
-
-    await this.prisma.friend.delete({
-      where: {
-        id: id,
-        userId: friendId,
-      },
-    });
-    console.log(
-      `${removedFriend.firstName} ${removedFriend.lastName} has been removed from the friend's list of ${user.firstName} ${user.lastName}`,
-    );
-    return removedFriend;
   }
 
   async updateUserData(
@@ -165,7 +139,7 @@ export class UserService {
     }
   }
 
-  async DeleteUser(userId: string):Promise<updatedUserData>{
+  async DeleteUser(userId: string): Promise<updatedUserData> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -174,14 +148,13 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    try {  
+    try {
       const deletedUser = this.prisma.user.delete({
-        where:{id:userId}
-      })
-      return deletedUser
+        where: { id: userId },
+      });
+      return deletedUser;
     } catch (error) {
       console.log(error);
-      
     }
   }
 }

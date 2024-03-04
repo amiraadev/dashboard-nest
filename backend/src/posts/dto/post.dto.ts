@@ -1,9 +1,18 @@
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class PostDto {
+  @IsString()
+  @IsNotEmpty()
   title: string;
+  @IsString()
+  @IsNotEmpty()
   description: string;
-  location?: string;
-  picturePath?: string;
+  @IsString()
+  @IsOptional()
+  location?: string | undefined;
+  @IsString()
+  @IsOptional()
+  picturePath?: string | undefined;
 }
 
 export interface PostToCreate {
@@ -28,7 +37,7 @@ export class NewPostDataDto {
   title?: string | null;
   description?: string | null;
   location?: string | null;
-  picturePath?: string;
+  picturePath?: string | null;
 }
 export interface Image {
   id?: string;

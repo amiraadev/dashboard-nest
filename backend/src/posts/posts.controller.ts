@@ -24,13 +24,16 @@ export class PostsController {
   @UseGuards(AtGuard)
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  createPost(
+   createPost(
     @Req() req: Request & { user: ReqUser },
     @Body() postDto: PostDto,
-  ): Promise<PostType> {
-    const userId = req.user.sub;
-    const postToBeCreated = { userId, ...postDto };
-    return this.postsService.createPost(postToBeCreated);
+  // ): Promise<PostType> {
+  ) {
+    return postDto;
+    
+    // const userId = req.user.sub;
+    // const postToBeCreated = { userId, ...postDto };
+    // return this.postsService.createPost(postToBeCreated);
   }
 
 
@@ -54,7 +57,41 @@ export class PostsController {
     @Param('postId') postId: string,
     @Body() newPostData: NewPostDataDto
   ): Promise<PostType> { 
+    console.log(newPostData);
+    
         const userId = req.user.sub;
     return this.postsService.updatePost(userId, postId, newPostData);
   }
+
+  @UseGuards(AtGuard)
+  @Get('getPost/:postId')
+  @HttpCode(HttpStatus.OK)
+  getPostById(
+    @Req() req: Request & { user: ReqUser },
+    @Param('postId') postId: string,
+  ): Promise<PostType> { 
+        const userId = req.user.sub;
+    return this.postsService.getPostById(userId, postId);
+  }
+
+
+  @UseGuards(AtGuard)
+  @Get('getPosts/:userId/:postId')
+  @HttpCode(HttpStatus.OK)
+  getPostsByUser(
+    @Param('userId') userId: string,
+  ): Promise<PostType[]> { 
+    return this.postsService.getPostsByUser(userId);
+  }
+  @UseGuards(AtGuard)
+  @Get('allPosts')
+  @HttpCode(HttpStatus.OK)
+  getAllPosts(
+    @Req() req: Request & { user: ReqUser },
+    @Param('userId') userId: string,
+  ): Promise<PostType[]> { 
+    return this.postsService.getAllPosts(userId);
+  }
+
+
 }
