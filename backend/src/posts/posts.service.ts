@@ -281,23 +281,26 @@ export class PostsService {
       where: {
         postId: postId,
       },
-      include:{user: true,post: true}
+      include: { user: true, post: true },
     });
     const transformedComments = comments.map((comment) => {
-      
-      const { user: { firstName, lastName },post:{title,description,picturePath,userpicturePath}, ...rest } = comment;
-    
+      const {
+        user: { firstName, lastName },
+        post: { title, description, picturePath, userpicturePath },
+        ...rest
+      } = comment;
+
       return {
-        ...rest, 
-        authorFirstName: firstName, 
-        authorLastName: lastName, 
-        authorPicture: userpicturePath, 
-        postPicture:picturePath,
-        postTitle:title,
-        postDescription:description,
+        ...rest,
+        authorFirstName: firstName,
+        authorLastName: lastName,
+        authorPicture: userpicturePath,
+        postPicture: picturePath,
+        postTitle: title,
+        postDescription: description,
       };
     });
-    return transformedComments
+    return transformedComments;
   }
 
   async getCommentsByUser(userId) {
@@ -310,25 +313,64 @@ export class PostsService {
     }
     const comments = await this.prisma.comment.findMany({
       where: {
-        userId
+        userId,
       },
-      include:{user: true,post: true}
+      include: { user: true, post: true },
     });
     const transformedComments = comments.map((comment) => {
-      
-      const { user: { firstName, lastName },post:{title,description,picturePath,userpicturePath}, ...rest } = comment;
-    
+      const {
+        user: { firstName, lastName },
+        post: { title, description, picturePath, userpicturePath },
+        ...rest
+      } = comment;
+
       return {
-        ...rest, 
-        authorFirstName: firstName, 
-        authorLastName: lastName, 
-        authorPicture: userpicturePath, 
-        postPicture:picturePath,
-        postTitle:title,
-        postDescription:description,
+        ...rest,
+        authorFirstName: firstName,
+        authorLastName: lastName,
+        authorPicture: userpicturePath,
+        postPicture: picturePath,
+        postTitle: title,
+        postDescription: description,
       };
     });
-    return transformedComments
-  
+    return transformedComments;
+  }
+
+  async getLikesByUser(userId) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const userWithLikes = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+    
+    const transformedlikes = userWithLikes.likes.map((like) => {
+
+         const {
+        user: { firstName, lastName },
+        ...rest
+      } = like;
+
+      return {
+        ...rest,
+        authorFirstName: firstName,
+        authorLastName: lastName,
+      };
+    });
+    return transformedlikes
   }
 }

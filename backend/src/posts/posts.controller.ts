@@ -124,4 +124,15 @@ export class PostsController {
   }
 
 
+  @UseGuards(AtGuard)
+  @Get('get/myLikes')
+  @HttpCode(HttpStatus.OK)
+  getLikesByUser(
+    @Req() req: Request & { user: ReqUser }
+  ) { 
+    const userId = req.user.sub;
+    return this.postsService.getLikesByUser(userId);
+  }
+
+
 }
