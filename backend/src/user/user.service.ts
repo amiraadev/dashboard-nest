@@ -30,65 +30,76 @@ export class UserService {
     };
   }
 
-  async getUserFriends(id: string): Promise<Friend[]> {
+  async follow(currentUserId, userIdToFollow) {
+    const currentUser = await this.prisma.user.findUnique({
+      where: { id: currentUserId },
+    });
+
+    const userToFollow = await this.prisma.user.findUnique({
+      where: { id: userIdToFollow },
+    });
+
+    if (!currentUser || !userToFollow) {
+      throw new NotFoundException('User or user to follow not found');
+    }
+    
+    if (!isFollowing) {
+      const addedFollower = await this.prisma.user.update({
+        where: { id: currentUserId },
+        data: {
+          following: {
+            connect: { id: userIdToFollow },
+          },
+        },
+      });
+      return {
+        id:userToFollow.id,
+        firstName:userToFollow.firstName,
+        lastName:userToFollow.lastName,
+      }
+    
+    } else {
+      const unFollowedUser = await this.prisma.user.update({
+        where: { id: currentUserId },
+        data: {
+          following: {
+            disconnect: { id: userIdToFollow },
+          },
+        },
+      });
+      return {
+        id:userToFollow.id,
+        firstName:userToFollow.firstName,
+        lastName:userToFollow.lastName,
+      }
+    }
+  }
+  async getFollowing(userId: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
     });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
-    const friends = await this.prisma.user
-      .findUnique({
-        where: { id: id },
-      })
-      .friends();
-
-    return friends;
-  }
-
-  async addRemoveFriend(id: string, friendId: string) {
-    const [user, friend] = await Promise.all([
-      this.prisma.user.findUnique({ where: { id } }),
-      this.prisma.user.findUnique({ where: { id: friendId } }),
-    ]);
-    if (!user || !friend) {
-      if (!friend) {
-        throw new NotFoundException('Friend not found');
-      } else {
-        throw new NotFoundException('User not found');
-      }
-    }
-    const existingFriend = await this.prisma.user.findUnique({
-      where: { id },
-      select: { friends: { where: { friendId } } },
+    const userWithFollowings = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include:{following: true}
     });
 
-    if (existingFriend.friends.length === 0) {
-      const addedFriend = await this.prisma.friend.create({
-        data: {
-          friendId,
-          userId: id,
-          firstName: friend.firstName,
-          lastName: friend.lastName,
-          picturePath: friend.picturePath,
-          occupation: friend.occupation,
-          location: friend.location,
-        },
-      });
-      console.log('friend added successfully');
+    const formattedFollowings = userWithFollowings.following.map(following =>{
+      const {
+        firstName, lastName ,picturePath,
+        ...rest
+      } = following;
 
-      return addedFriend;
-    } else {
-      const deletedFriend = await this.prisma.friend.deleteMany({
-        where: {
-          AND: [{ friendId }, { userId: id }],
-        },
-      });
-      console.log('friend deleted successfully');
-
-      return deletedFriend;
-    }
+      return {
+        firstName,
+        lastName,
+        picturePath
+      }; 
+    })
+    
+    return formattedFollowings;
   }
 
   async updateUserData(
@@ -116,7 +127,7 @@ export class UserService {
         where: { id: userId },
         data: updatedUserData,
       });
-    
+
       const returnedUpdatedUser = {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
@@ -148,4 +159,137 @@ export class UserService {
       console.log(error);
     }
   }
+
+  async getLikesByUser(userId) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const userWithLikes = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    const transformedlikes = userWithLikes.likes.map((like) => {
+      const {
+        user: { firstName, lastName },
+        ...rest
+      } = like;
+
+      return {
+        ...rest,
+        authorFirstName: firstName,
+        authorLastName: lastName,
+      };
+    });
+    return transformedlikes;
+  }
+
+  async getCommentsByUser(userId) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const comments = await this.prisma.comment.findMany({
+      where: {
+        userId,
+      },
+      include: { user: true, post: true },
+    });
+    const transformedComments = comments.map((comment) => {
+      const {
+        user: { firstName, lastName },
+        post: { title, description, picturePath, userpicturePath },
+        ...rest
+      } = comment;
+
+      return {
+        ...rest,
+        authorFirstName: firstName,
+        authorLastName: lastName,
+        authorPicture: userpicturePath,
+        postPicture: picturePath,
+        postTitle: title,
+        postDescription: description,
+      };
+    });
+    return transformedComments;
+  }
+
+  // async getUserFriends(id: string): Promise<Friend[]> {
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id },
+  //   });
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   const friends = await this.prisma.user
+  //     .findUnique({
+  //       where: { id: id },
+  //     })
+  //     .friends();
+
+  //   return friends;
+  // }
+
+  // async addRemoveFriend(id: string, friendId: string) {
+  //   const [user, friend] = await Promise.all([
+  //     this.prisma.user.findUnique({ where: { id } }),
+  //     this.prisma.user.findUnique({ where: { id: friendId } }),
+  //   ]);
+  //   if (!user || !friend) {
+  //     if (!friend) {
+  //       throw new NotFoundException('Friend not found');
+  //     } else {
+  //       throw new NotFoundException('User not found');
+  //     }
+  //   }
+  //   const existingFriend = await this.prisma.user.findUnique({
+  //     where: { id },
+  //     select: { friends: { where: { friendId } } },
+  //   });
+
+  //   if (existingFriend.friends.length === 0) {
+  //     const addedFriend = await this.prisma.friend.create({
+  //       data: {
+  //         friendId,
+  //         userId: id,
+  //         firstName: friend.firstName,
+  //         lastName: friend.lastName,
+  //         picturePath: friend.picturePath,
+  //         occupation: friend.occupation,
+  //         location: friend.location,
+  //       },
+  //     });
+  //     console.log('friend added successfully');
+
+  //     return addedFriend;
+  //   } else {
+  //     const deletedFriend = await this.prisma.friend.deleteMany({
+  //       where: {
+  //         AND: [{ friendId }, { userId: id }],
+  //       },
+  //     });
+  //     console.log('friend deleted successfully');
+
+  //     return deletedFriend;
+  //   }
+  // }
+
+  
 }

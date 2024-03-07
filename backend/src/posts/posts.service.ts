@@ -35,11 +35,10 @@ export class PostsService {
     });
 
     if (image) {
-      const updatedImg = await this.prisma.image.update({
+     await this.prisma.image.update({
         where: { id: image.id },
         data: { postId: createdPost.id },
       });
-      console.log('updated image' + updatedImg);
     }
     return createdPost;
   }
