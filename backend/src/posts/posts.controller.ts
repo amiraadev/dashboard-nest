@@ -12,7 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { PostType, PostDto, NewPostDataDto } from './dto/post.dto';
+import { PostType, NewPostDataDto, PostToCreate } from './dto/post.dto';
 import { AtGuard } from 'src/common/decorators/guards';
 import { Request } from 'express';
 import { ReqUser } from 'src/user/dto/user.dto';
@@ -26,14 +26,10 @@ export class PostsController {
   @HttpCode(HttpStatus.OK)
    createPost(
     @Req() req: Request & { user: ReqUser },
-    @Body() postDto: PostDto,
-  // ): Promise<PostType> {
+    @Body() postDto: PostToCreate,
   ) {
-    return postDto;
-    
-    // const userId = req.user.sub;
-    // const postToBeCreated = { userId, ...postDto };
-    // return this.postsService.createPost(postToBeCreated);
+    const userId = req.user.sub;
+    return this.postsService.createPost(userId,postDto);
   }
 
 
@@ -58,7 +54,6 @@ export class PostsController {
     @Body() newPostData: NewPostDataDto
   ): Promise<PostType> { 
     console.log(newPostData);
-    
         const userId = req.user.sub;
     return this.postsService.updatePost(userId, postId, newPostData);
   }
@@ -83,14 +78,17 @@ export class PostsController {
   ): Promise<PostType[]> { 
     return this.postsService.getPostsByUser(userId);
   }
+
   @UseGuards(AtGuard)
-  @Get('allPosts')
+  @Post('like/:postId')
   @HttpCode(HttpStatus.OK)
   getAllPosts(
     @Req() req: Request & { user: ReqUser },
-    @Param('userId') userId: string,
-  ): Promise<PostType[]> { 
-    return this.postsService.getAllPosts(userId);
+    @Param('postId') postId: string,
+  // ): Promise<PostType[]> { 
+  ) { 
+    const userId = req.user.sub;
+    return this.postsService.likePost(userId,postId);
   }
 
 

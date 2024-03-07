@@ -10,6 +10,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model User {
+//   id             String   @id @default(uuid())
+//   firstName      String
+//   lastName       String
+//   email          String   @unique
+//   hashedPassword String?
+//   hashedRefToken String   @default("")
+//   picturePath    String?
+//   location       String?
+//   occupation     String?
+//   viewedProfile  Int      @default(0)
+//   impressions    Int      @default(0)
+//   createdAt      DateTime @default(now())
+//   updatedAt      DateTime @updatedAt
+
+//   friends  Friend[]
+//   posts    Post[]
+//   Likes    Like[]
+//   Comments Comment[]
+//   picture  Image?    @relation(fields: [picturePath], references: [path])
+
+//   @@unique([firstName, lastName])
+// }
+
 model User {
   id             String   @id @default(uuid())
   firstName      String
@@ -24,19 +48,20 @@ model User {
   impressions    Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  picture        Image?   @relation(fields: [picturePath], references: [path])
 
-  friends  Friend[]
+  followedBy User[] @relation("UserFollows")
+  following  User[] @relation("UserFollows")
+
   posts    Post[]
-  Likes    Like[]
+  likes    Post[]    @relation(name: "UserLikes")
   Comments Comment[]
-  picture  Image?    @relation(fields: [picturePath], references: [path])
-
-  @@unique([firstName, lastName])
+  Friend   Friend[]
 }
 
 model Friend {
   id          String  @id @default(uuid())
-  friendId     String
+  friendId    String
   userId      String
   firstName   String
   lastName    String
@@ -59,16 +84,15 @@ model Post {
   userpicturePath String?
   picturePath     String?
 
-  likes    Like[]
+  likedBy   User[]   @relation(name: "UserLikes") 
   Comments Comment[]
-  user     User      @relation(fields: [userId], references: [id])
-
-  // postPictures Image[] @relation("postPicture")
-  // userPicture  Image?  @relation("picturePath", fields: [picturePath], references: [path])
+  user User @relation(fields: [userId], references: [id])
 
   postPictures    Image[] @relation("postPicture")
   PostUserPicture Image?  @relation("picturePath", fields: [picturePath], references: [path])
 }
+
+
 
 model Image {
   id     String   @id @default(uuid())
@@ -86,17 +110,6 @@ model Image {
 
   // postsOfThisUserPicture     Post[] @relation("postPicture")
   // postsOfThisPicture Post[] @relation("picturePath")
-}
-
-model Like {
-  id     String @id @default(uuid())
-  postId String
-  userId String
-
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, postId]) // A user can like a post just one time 
 }
 
 model Comment {

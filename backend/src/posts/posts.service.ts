@@ -4,15 +4,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { PostType, Image, PostToCreate, NewPostDataDto } from './dto/post.dto';
+import { PostType, Image, NewPostDataDto } from './dto/post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
-  async createPost(postToCreate: PostToCreate): Promise<PostType> {
-    const userId = postToCreate.userId;
+  async createPost(userId, postToCreate): Promise<PostType> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -28,8 +27,8 @@ export class PostsService {
     }
 
     const postData = user.picturePath
-      ? { userpicturePath: user.picturePath, ...postToCreate }
-      : postToCreate;
+      ? { userpicturePath: user.picturePath, userId, ...postToCreate }
+      : { userId, ...postToCreate };
 
     const createdPost = await this.prisma.post.create({
       data: postData,
@@ -158,7 +157,6 @@ export class PostsService {
       }),
     ]);
 
-    // Throw errors upfront if user or post not found
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -191,5 +189,43 @@ export class PostsService {
     return posts;
   }
 
-  
+  async likePost(userId, postId) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    const listOfLikes = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        likedBy: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    })
+     const userAlreadyLikesPst = listOfLikes.likedBy.some(user => user.id === userId)
+    
+     console.log({userAlreadyLikesPst});
+
+    //  await this.prisma.post.update({
+    //   where: { id: postId }, // replace with the id of the video you want to update
+    //   data: {
+    //     likedBy: {
+    //       connect: { id: userId }, // replace with the id of the user you want to add
+    //     },
+    //   },
+    // });
+
+
+  }
 }

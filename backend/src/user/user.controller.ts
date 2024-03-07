@@ -40,7 +40,6 @@ export class UserController {
   addRemoveFriend(
     @Req() req: Request & { user: ReqUser },
     @Param('friendId') friendId: string,
-  // ): Promise<Friend> {
   ) {
     const userId = req.user.sub;
     return this.userService.addRemoveFriend(userId, friendId);
