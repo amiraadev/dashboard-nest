@@ -166,7 +166,7 @@ export class PostsService {
     return post;
   }
 
-  async getPostsByUser(userId): Promise<PostType[]> {
+  async getPostsByUserId(userId): Promise<PostType[]> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -189,6 +189,7 @@ export class PostsService {
     const posts = await this.prisma.post.findMany();
     return posts;
   }
+  //***************************************************LIKES************************************************ */
 
   async likePost(userId, postId) {
     const user = await this.prisma.user.findUnique({
@@ -241,139 +242,7 @@ export class PostsService {
     return PostPlusLike;
   }
 
-  async AddComment(userId, postId, commentContent) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const post = await this.prisma.post.findUnique({
-      where: { id: postId },
-    });
-
-    if (!post) {
-      throw new NotFoundException('Post not found');
-    }
-    const newComment = await this.prisma.comment.create({
-      data: {
-        content: commentContent.comment,
-        user: {
-          connect: { id: userId },
-        },
-        post: {
-          connect: { id: postId },
-        },
-      },
-    });
-    return newComment;
-  }
-
-  async getCommentsByPostId(postId) {
-    const post = await this.prisma.post.findUnique({
-      where: { id: postId },
-    });
-
-    if (!post) {
-      throw new NotFoundException('Post not found');
-    }
-    const comments = await this.prisma.comment.findMany({
-      where: {
-        postId: postId,
-      },
-      include: { user: true, post: true },
-    });
-    const transformedComments = comments.map((comment) => {
-      const {
-        user: { firstName, lastName },
-        post: { title, description, picturePath, userpicturePath },
-        ...rest
-      } = comment;
-
-      return {
-        ...rest,
-        authorFirstName: firstName,
-        authorLastName: lastName,
-        authorPicture: userpicturePath,
-        postPicture: picturePath,
-        postTitle: title,
-        postDescription: description,
-      };
-    });
-    return transformedComments;
-  }
-
-  async getCommentsByUser(userId) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const comments = await this.prisma.comment.findMany({
-      where: {
-        userId,
-      },
-      include: { user: true, post: true },
-    });
-    const transformedComments = comments.map((comment) => {
-      const {
-        user: { firstName, lastName },
-        post: { title, description, picturePath, userpicturePath },
-        ...rest
-      } = comment;
-
-      return {
-        ...rest,
-        authorFirstName: firstName,
-        authorLastName: lastName,
-        authorPicture: userpicturePath,
-        postPicture: picturePath,
-        postTitle: title,
-        postDescription: description,
-      };
-    });
-    return transformedComments;
-  }
-
-  async getLikesByUser(userId) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const userWithLikes = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      include: {
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
-
-    const transformedlikes = userWithLikes.likes.map((like) => {
-      const {
-        user: { firstName, lastName },
-        ...rest
-      } = like;
-
-      return {
-        ...rest,
-        authorFirstName: firstName,
-        authorLastName: lastName,
-      };
-    });
-    return transformedlikes;
-  }
-
-  async getPostLikes(userId, postId) {
+  async getLikesByPostId(userId, postId) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -410,4 +279,87 @@ export class PostsService {
     });
     return transformedPostLikes;
   }
+
+  //***************************************************COMMENTS************************************************ */
+
+  async commentOnPost(userId, postId, commentContent) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    const newComment = await this.prisma.comment.create({
+      data: {
+        content: commentContent.comment,
+        user: {
+          connect: { id: userId },
+        },
+        post: {
+          connect: { id: postId },
+        },
+      },
+    });
+    const commentToReturn = await this.prisma.comment.findUnique({
+      where:{
+        id:newComment.id
+      },
+      include:{
+        user:true,post:true
+      }
+    })
+    const {user:{firstName,lastName,picturePath: authPicturePath},post:{title,description,picturePath: postPicturePath},...rest}=commentToReturn
+    return {
+      ...rest,
+      authorFirstName:firstName,
+      authorLastName:lastName,
+      authorPicture:authPicturePath,
+      postTitle:title,
+      postDescription:description,
+      postPicture:postPicturePath
+    };
+  }
+
+  async getCommentsByPostId(postId) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    const comments = await this.prisma.comment.findMany({
+      where: {
+        postId: postId,
+      },
+      include: { user: true, post: true },
+    });
+    const transformedComments = comments.map((comment) => {
+      const {
+        user: { firstName, lastName },
+        post: { title, description, picturePath, userpicturePath },
+        ...rest
+      } = comment;
+
+      return {
+        ...rest,
+        authorFirstName: firstName,
+        authorLastName: lastName,
+        authorPicture: userpicturePath,
+        postPicture: picturePath,
+        postTitle: title,
+        postDescription: description,
+      };
+    });
+    return transformedComments;
+  }
+
+  
 }

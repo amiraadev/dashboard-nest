@@ -76,7 +76,7 @@ export class PostsController {
   getPostsByUser(
     @Param('userId') userId: string,
   ): Promise<PostType[]> { 
-    return this.postsService.getPostsByUser(userId);
+    return this.postsService.getPostsByUserId(userId);
   }
 
   @UseGuards(AtGuard)
@@ -92,7 +92,7 @@ export class PostsController {
   }
 
   @UseGuards(AtGuard)
-  @Post('add/comment/:postId')
+  @Post('commentOn/:postId')
   @HttpCode(HttpStatus.OK)
   commentPost(
     @Req() req: Request & { user: ReqUser },
@@ -100,7 +100,7 @@ export class PostsController {
     @Body() commentContent: CommentDto,
   ) { 
     const userId = req.user.sub;
-    return this.postsService.AddComment(userId,postId,commentContent);
+    return this.postsService.commentOnPost(userId,postId,commentContent);
   }
 
   @UseGuards(AtGuard)
@@ -112,28 +112,6 @@ export class PostsController {
     return this.postsService.getCommentsByPostId(postId);
   }
 
-
-  @UseGuards(AtGuard)
-  @Get('get/myComments')
-  @HttpCode(HttpStatus.OK)
-  getCommentsByUser(
-    @Req() req: Request & { user: ReqUser }
-  ) { 
-    const userId = req.user.sub;
-    return this.postsService.getCommentsByUser(userId);
-  }
-
-
-  @UseGuards(AtGuard)
-  @Get('get/myLikes')
-  @HttpCode(HttpStatus.OK)
-  getLikesByUser(
-    @Req() req: Request & { user: ReqUser }
-  ) { 
-    const userId = req.user.sub;
-    return this.postsService.getLikesByUser(userId);
-  }
-
   @UseGuards(AtGuard)
   @Get('likes/:postId')
   @HttpCode(HttpStatus.OK)
@@ -143,7 +121,7 @@ export class PostsController {
   ) { 
     const userId = req.user.sub;
     
-    return this.postsService.getPostLikes(userId,postId);
+    return this.postsService.getLikesByPostId(userId,postId);
   }
 
 
