@@ -215,8 +215,18 @@ export class PostsService {
     })
      const userAlreadyLikesPst = listOfLikes.likedBy.some(user => user.id === userId)
     
-     console.log({userAlreadyLikesPst});
+if(userAlreadyLikesPst){
+  const updatedPost = await this.prisma.post.update({
+    where: { id: postId },
+    data: {
+      likedBy: {
+        disconnect: { id: userId },
+      },
+    },
+  });
+}else{
 
+}
     //  await this.prisma.post.update({
     //   where: { id: postId }, // replace with the id of the video you want to update
     //   data: {
