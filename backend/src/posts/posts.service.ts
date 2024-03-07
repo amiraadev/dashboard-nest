@@ -357,10 +357,9 @@ export class PostsService {
         },
       },
     });
-    
-    const transformedlikes = userWithLikes.likes.map((like) => {
 
-         const {
+    const transformedlikes = userWithLikes.likes.map((like) => {
+      const {
         user: { firstName, lastName },
         ...rest
       } = like;
@@ -371,6 +370,44 @@ export class PostsService {
         authorLastName: lastName,
       };
     });
-    return transformedlikes
+    return transformedlikes;
+  }
+
+  async getPostLikes(userId, postId) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const postLikes = await this.prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        likedBy: true,
+      },
+    });
+    const transformedPostLikes = postLikes.likedBy.map((like) => {
+      const { firstName, lastName, id, picturePath, ...rest } = like;
+
+      return {
+        id,
+        firstName,
+        lastName,
+        picturePath,
+      };
+    });
+    return transformedPostLikes;
   }
 }
