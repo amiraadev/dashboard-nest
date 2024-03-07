@@ -98,7 +98,7 @@ export class UserService {
         picturePath
       }; 
     })
-    
+
     return formattedFollowings;
   }
 
@@ -230,66 +230,7 @@ export class UserService {
     return transformedComments;
   }
 
-  // async getUserFriends(id: string): Promise<Friend[]> {
-  //   const user = await this.prisma.user.findUnique({
-  //     where: { id },
-  //   });
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-
-  //   const friends = await this.prisma.user
-  //     .findUnique({
-  //       where: { id: id },
-  //     })
-  //     .friends();
-
-  //   return friends;
-  // }
-
-  // async addRemoveFriend(id: string, friendId: string) {
-  //   const [user, friend] = await Promise.all([
-  //     this.prisma.user.findUnique({ where: { id } }),
-  //     this.prisma.user.findUnique({ where: { id: friendId } }),
-  //   ]);
-  //   if (!user || !friend) {
-  //     if (!friend) {
-  //       throw new NotFoundException('Friend not found');
-  //     } else {
-  //       throw new NotFoundException('User not found');
-  //     }
-  //   }
-  //   const existingFriend = await this.prisma.user.findUnique({
-  //     where: { id },
-  //     select: { friends: { where: { friendId } } },
-  //   });
-
-  //   if (existingFriend.friends.length === 0) {
-  //     const addedFriend = await this.prisma.friend.create({
-  //       data: {
-  //         friendId,
-  //         userId: id,
-  //         firstName: friend.firstName,
-  //         lastName: friend.lastName,
-  //         picturePath: friend.picturePath,
-  //         occupation: friend.occupation,
-  //         location: friend.location,
-  //       },
-  //     });
-  //     console.log('friend added successfully');
-
-  //     return addedFriend;
-  //   } else {
-  //     const deletedFriend = await this.prisma.friend.deleteMany({
-  //       where: {
-  //         AND: [{ friendId }, { userId: id }],
-  //       },
-  //     });
-  //     console.log('friend deleted successfully');
-
-  //     return deletedFriend;
-  //   }
-  // }
+  
 
   
 }

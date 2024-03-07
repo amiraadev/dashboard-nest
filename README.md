@@ -11,4 +11,13 @@ calendar library
 # nivo (charts)
 nivo provides a rich set of dataviz components, built on top of D3 and React
 
-T
+
+
+### API endpoints
+  ## Auth
+   # register 
+    - Post : http://localhost:5005/auth/register
+   # login
+    - Post : http://localhost:5005/auth/login
+  ## Users
+  
