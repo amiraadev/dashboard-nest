@@ -212,30 +212,31 @@ export class PostsService {
           },
         },
       },
-    })
-     const userAlreadyLikesPst = listOfLikes.likedBy.some(user => user.id === userId)
-    
-if(userAlreadyLikesPst){
-  const updatedPost = await this.prisma.post.update({
-    where: { id: postId },
-    data: {
-      likedBy: {
-        disconnect: { id: userId },
+    });
+    const userAlreadyLikesPst = listOfLikes.likedBy.some(
+      (user) => user.id === userId,
+    );
+
+    if (userAlreadyLikesPst) {
+      const PostMinusLike = await this.prisma.post.update({
+        where: { id: postId },
+        data: {
+          likedBy: {
+            disconnect: { id: userId },
+          },
+        },
+      });
+      return PostMinusLike;
+    } else {
+    }
+    const PostPlusLike = await this.prisma.post.update({
+      where: { id: postId }, 
+      data: {
+        likedBy: {
+          connect: { id: userId },
+        },
       },
-    },
-  });
-}else{
-
-}
-    //  await this.prisma.post.update({
-    //   where: { id: postId }, // replace with the id of the video you want to update
-    //   data: {
-    //     likedBy: {
-    //       connect: { id: userId }, // replace with the id of the user you want to add
-    //     },
-    //   },
-    // });
-
-
+    });
+    return PostPlusLike;
   }
 }
