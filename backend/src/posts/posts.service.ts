@@ -174,10 +174,11 @@ export class PostsService {
       throw new NotFoundException('User not found');
     }
     const posts = await this.prisma.post.findMany({
-      where: { userId: userId },
+      where: { userId },
     });
     return posts;
   }
+
   async getAllPosts(userId): Promise<PostType[]> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -230,7 +231,7 @@ export class PostsService {
     } else {
     }
     const PostPlusLike = await this.prisma.post.update({
-      where: { id: postId }, 
+      where: { id: postId },
       data: {
         likedBy: {
           connect: { id: userId },
@@ -238,5 +239,96 @@ export class PostsService {
       },
     });
     return PostPlusLike;
+  }
+
+  async AddComment(userId, postId, commentContent) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    const newComment = await this.prisma.comment.create({
+      data: {
+        content: commentContent.comment,
+        user: {
+          connect: { id: userId },
+        },
+        post: {
+          connect: { id: postId },
+        },
+      },
+    });
+    return newComment;
+  }
+
+  async getCommentsByPostId(postId) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    const comments = await this.prisma.comment.findMany({
+      where: {
+        postId: postId,
+      },
+      include:{user: true,post: true}
+    });
+    const transformedComments = comments.map((comment) => {
+      
+      const { user: { firstName, lastName },post:{title,description,picturePath,userpicturePath}, ...rest } = comment;
+    
+      return {
+        ...rest, 
+        authorFirstName: firstName, 
+        authorLastName: lastName, 
+        authorPicture: userpicturePath, 
+        postPicture:picturePath,
+        postTitle:title,
+        postDescription:description,
+      };
+    });
+    return transformedComments
+  }
+
+  async getCommentsByUser(userId) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const comments = await this.prisma.comment.findMany({
+      where: {
+        userId
+      },
+      include:{user: true,post: true}
+    });
+    const transformedComments = comments.map((comment) => {
+      
+      const { user: { firstName, lastName },post:{title,description,picturePath,userpicturePath}, ...rest } = comment;
+    
+      return {
+        ...rest, 
+        authorFirstName: firstName, 
+        authorLastName: lastName, 
+        authorPicture: userpicturePath, 
+        postPicture:picturePath,
+        postTitle:title,
+        postDescription:description,
+      };
+    });
+    return transformedComments
+  
   }
 }

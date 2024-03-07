@@ -93,7 +93,6 @@ model Post {
 }
 
 
-
 model Image {
   id     String   @id @default(uuid())
   path   String   @unique
@@ -102,14 +101,9 @@ model Image {
   Friend Friend[]
   User   User[]
 
-  // Post  Post?  @relation("postPicture", fields: [postId], references: [id])
-  // posts Post[] @relation("picturePath")
-
   postsOfThisPicture     Post[] @relation("postPicture")
   postsOfThisUserPicture Post[] @relation("picturePath")
 
-  // postsOfThisUserPicture     Post[] @relation("postPicture")
-  // postsOfThisPicture Post[] @relation("picturePath")
 }
 
 model Comment {
@@ -118,6 +112,7 @@ model Comment {
   userId    String
   content   String
   createdAt DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id])

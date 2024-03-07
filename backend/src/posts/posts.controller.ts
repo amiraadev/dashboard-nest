@@ -12,7 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { PostType, NewPostDataDto, PostToCreate } from './dto/post.dto';
+import { PostType, NewPostDataDto, PostToCreate, CommentDto } from './dto/post.dto';
 import { AtGuard } from 'src/common/decorators/guards';
 import { Request } from 'express';
 import { ReqUser } from 'src/user/dto/user.dto';
@@ -82,13 +82,45 @@ export class PostsController {
   @UseGuards(AtGuard)
   @Post('like/:postId')
   @HttpCode(HttpStatus.OK)
-  getAllPosts(
+  likePost(
     @Req() req: Request & { user: ReqUser },
     @Param('postId') postId: string,
   // ): Promise<PostType[]> { 
   ) { 
     const userId = req.user.sub;
     return this.postsService.likePost(userId,postId);
+  }
+
+  @UseGuards(AtGuard)
+  @Post('add/comment/:postId')
+  @HttpCode(HttpStatus.OK)
+  commentPost(
+    @Req() req: Request & { user: ReqUser },
+    @Param('postId') postId: string,
+    @Body() commentContent: CommentDto,
+  ) { 
+    const userId = req.user.sub;
+    return this.postsService.AddComment(userId,postId,commentContent);
+  }
+
+  @UseGuards(AtGuard)
+  @Get('get/comments/:postId')
+  @HttpCode(HttpStatus.OK)
+  getCommentsByPostId(
+    @Param('postId') postId: string,
+  ) { 
+    return this.postsService.getCommentsByPostId(postId);
+  }
+
+
+  @UseGuards(AtGuard)
+  @Get('get/myComments')
+  @HttpCode(HttpStatus.OK)
+  getCommentsByUser(
+    @Req() req: Request & { user: ReqUser }
+  ) { 
+    const userId = req.user.sub;
+    return this.postsService.getCommentsByUser(userId);
   }
 
 

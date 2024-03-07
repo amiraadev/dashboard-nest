@@ -15,6 +15,11 @@ export class PostDto {
   picturePath?: string | undefined;
 }
 
+export class CommentDto {
+  @IsString()
+  comment: string;
+ 
+}
 export interface PostToCreate {
   userId: string;
   title: string;
