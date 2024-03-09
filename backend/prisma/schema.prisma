@@ -9,31 +9,6 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
-// model User {
-//   id             String   @id @default(uuid())
-//   firstName      String
-//   lastName       String
-//   email          String   @unique
-//   hashedPassword String?
-//   hashedRefToken String   @default("")
-//   picturePath    String?
-//   location       String?
-//   occupation     String?
-//   viewedProfile  Int      @default(0)
-//   impressions    Int      @default(0)
-//   createdAt      DateTime @default(now())
-//   updatedAt      DateTime @updatedAt
-
-//   friends  Friend[]
-//   posts    Post[]
-//   Likes    Like[]
-//   Comments Comment[]
-//   picture  Image?    @relation(fields: [picturePath], references: [path])
-
-//   @@unique([firstName, lastName])
-// }
-
 model User {
   id             String   @id @default(uuid())
   firstName      String

@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Friend, User, updatedUserData } from './dto/user.dto';
+import {  User, updatedUserData } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -42,9 +42,19 @@ export class UserService {
     if (!currentUser || !userToFollow) {
       throw new NotFoundException('User or user to follow not found');
     }
-    
+    const userFollowings = await this.prisma.user.findUnique({
+      where: {
+        id: currentUserId,
+      },
+      include: {
+        following: true,
+      },
+    });
+  
+    const isFollowing = userFollowings.following.some((following) => following.id === userIdToFollow);
+  
     if (!isFollowing) {
-      const addedFollower = await this.prisma.user.update({
+       await this.prisma.user.update({
         where: { id: currentUserId },
         data: {
           following: {
@@ -59,7 +69,7 @@ export class UserService {
       }
     
     } else {
-      const unFollowedUser = await this.prisma.user.update({
+       await this.prisma.user.update({
         where: { id: currentUserId },
         data: {
           following: {
@@ -74,6 +84,7 @@ export class UserService {
       }
     }
   }
+
   async getFollowing(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

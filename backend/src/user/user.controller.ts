@@ -12,7 +12,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Friend, ReqUser, User, updatedUserData } from './dto/user.dto';
+import {  ReqUser, User, updatedUserData } from './dto/user.dto';
 import { AtGuard } from 'src/common/decorators/guards';
 import { Request } from 'express';
 
