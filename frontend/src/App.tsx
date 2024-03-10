@@ -1,6 +1,5 @@
 /** @format */
 
-import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./scenes/homePage";
 import LoginPage from "./scenes/loginPage";
@@ -13,7 +12,7 @@ import { themeSettings } from "./theme";
 
 import { StateProps } from "./types";
 import { ThemeMode } from "./theme";
-import Navbar from "./scenes/navbar";
+
 
 function App() {
 
@@ -25,7 +24,6 @@ function App() {
 			<BrowserRouter>
 				<ThemeProvider theme={theme}>
 					<CssBaseline />
-          <Navbar/>
 					<Routes>
 						<Route path='/' element={<LoginPage />} />
 						<Route path='/home' element={<HomePage />} />

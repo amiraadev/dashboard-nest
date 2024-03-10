@@ -44,12 +44,12 @@ const Navbar = () => {
 	const dark = theme.palette.neutral.dark;
 	const background = theme.palette.background.default;
 	const primaryLight = theme.palette.primary.light;
-	const alt = theme.palette.background.default;
+	const alt = theme.palette.background.alt;
 
 	const fullName = `${user?.firstName} ${user?.lastName}`;
 	return (
-		<FlexBetween padding='1rem 6%' backgroundColor={alt}>
-			<FlexBetween gap='1.75rem'>
+		<FlexBetween padding='1rem 4%' backgroundColor={alt}>
+			<FlexBetween gap='1.75rem' backgroundColor={alt}>
 				<Typography
 					fontWeight='bold'
 					fontSize='clamp(1rem, 2rem, 2.25rem)'
@@ -61,7 +61,7 @@ const Navbar = () => {
 							cursor: "pointer",
 						},
 					}}>
-					Sociopedia
+					Amiradev
 				</Typography>
 				{isNonMobileScreens && (
 					<FlexBetween
@@ -79,23 +79,23 @@ const Navbar = () => {
 
 			{/* DESKTOP NAV */}
 			{isNonMobileScreens ? (
-				<FlexBetween gap='2rem'>
+				<FlexBetween gap='2rem' backgroundColor={alt}>
 					<IconButton onClick={() => dispatch(setMode())}>
 						{theme.palette.mode === "dark" ? (
-							<DarkMode sx={{ fontSize: "25px" }} />
+							<DarkMode sx={{ fontSize: "25px" }} color='primary'/>
 						) : (
-							<LightMode sx={{ color: dark, fontSize: "25px" }} />
+							<LightMode sx={{ color: dark, fontSize: "25px" }} color='primary' />
 						)}
 					</IconButton>
-					<Message sx={{ fontSize: "25px" }} />
-					<Notifications sx={{ fontSize: "25px" }} />
-					<Help sx={{ fontSize: "25px" }} />
+					<Message sx={{ fontSize: "25px" }} color='primary'/>
+					<Notifications sx={{ fontSize: "25px" }} color='primary' />
+					<Help sx={{ fontSize: "25px" }} color='primary'/>
 					<FormControl variant='standard'>
 						<Select
 							value={fullName}
 							sx={{
 								backgroundColor: neutralLight,
-								width: "150px",
+								width: "200px",
 								borderRadius: "0.25rem",
 								p: "0.25rem 1rem",
 								"& .MuiSvgIcon-root": {
