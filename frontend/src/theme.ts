@@ -1,9 +1,10 @@
 // color design tokens export
+// import {  PaletteOptions, ThemeOptions } from "@mui/material/styles";
 
-export enum ThemeMode {
-    Light = "light",
-    Dark = "dark",
-  }
+// export enum ThemeMode {
+//     Light = "light",
+//     Dark = "dark",
+//   }
 
 export const colorTokens = {
     grey: {
@@ -34,9 +35,73 @@ export const colorTokens = {
       900: "#001519",
     },
   };
-  
+
   // mui theme settings
-  export const themeSettings = (mode: ThemeMode) => {
+//   type ColorTokens = {
+//     grey: Record<number, string>;
+//     primary: Record<number, string>;
+//   };
+  
+  export type ThemeMode = "light" | "dark";
+  
+  type Neutral = {
+    dark: string;
+    main: string;
+    mediumMain: string;
+    medium: string;
+    light: string;
+  };
+  
+  type Background = {
+    default: string;
+    alt?: string; // Optional alt property
+  };
+  
+  type Palette = {
+    mode: ThemeMode;
+    primary: {
+      dark: string;
+      main: string;
+      light: string;
+    };
+    neutral: Neutral;
+    background: Background;
+  };
+  
+  type Typography = {
+    fontFamily: string;
+    fontSize: number;
+    h1: {
+      fontFamily: string;
+      fontSize: number;
+    };
+    h2: {
+      fontFamily: string;
+      fontSize: number;
+    };
+    h3: {
+      fontFamily: string;
+      fontSize: number;
+    };
+    h4: {
+      fontFamily: string;
+      fontSize: number;
+    };
+    h5: {
+      fontFamily: string;
+      fontSize: number;
+    };
+    h6: {
+      fontFamily: string;
+      fontSize: number;
+    };
+  };
+  
+  export interface ThemeOptions {
+    palette: Palette;
+    typography: Typography;
+  }
+  export const themeSettings =(mode: ThemeMode): ThemeOptions => {
     return {
       palette: {
         mode: mode,
@@ -57,7 +122,7 @@ export const colorTokens = {
               },
               background: {
                 default: colorTokens.grey[900],
-                alt: colorTokens.grey[800],
+                //  alt: colorTokens.grey[800],
               },
             }
           : {
@@ -76,7 +141,7 @@ export const colorTokens = {
               },
               background: {
                 default: colorTokens.grey[10],
-                alt: colorTokens.grey[0],
+                // alt: colorTokens.grey[0],
               },
             }),
       },

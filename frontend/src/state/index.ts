@@ -1,23 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Post, User } from "types";
 
-// Interfaces for type definitions
-interface User {
-    friends: string[];
-}
 
-interface Post {
-    id: string;
-    userId: string;
-    title: string;
-    description: string;
-    location: string;
-    userpicturePath: string;
-    picturePath: string;
-    postPictures: string[];
-    PostUserPicture: string; // Consider renaming to match other property casings
-}
 
-// Initial state with types
 const initialState: {
     mode: string;
     user: User | null;
