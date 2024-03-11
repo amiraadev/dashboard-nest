@@ -1,5 +1,6 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import Form from "./Form";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
 import { ThemeOptions } from "theme";
 import { useState } from "react";
 
@@ -10,6 +11,7 @@ const LoginPage = () => {
   const [pageType, setPageType] = useState("login");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  
   return (
     <Box>
       <Box
@@ -31,7 +33,9 @@ const LoginPage = () => {
         sx={{ backgroundColor: `${theme.palette.background.alt}` }}
       >
   
-        <Form />
+       {isLogin && <LoginForm setPageType={setPageType}/>} 
+
+       {isRegister && <RegisterForm />} 
       </Box>
     </Box>
   );

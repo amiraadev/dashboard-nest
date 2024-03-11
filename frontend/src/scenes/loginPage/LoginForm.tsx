@@ -10,6 +10,10 @@ import axios from "axios";
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 
+interface LoginFormProps {
+	setPageType: (newPageType: string) => void;
+  }
+
 const validationSchema = yup.object({
 	email: yup
 		.string()
@@ -22,7 +26,7 @@ const validationSchema = yup.object({
 });
 
 
-const FormModal = () => {
+const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
     const navigate = useNavigate()
 	const formik = useFormik({
 		initialValues: {
@@ -96,7 +100,7 @@ const FormModal = () => {
 					</Button>
 				</form>
 				<hr />
-                <p>Don't have an account? <span style={{ textDecoration: 'underline', fontWeight: 'bold',cursor: "pointer" }}>Sign Up here</span></p>
+                <p>Don't have an account? <span onClick={()=>setPageType("register")} style={{ textDecoration: 'underline', fontWeight: 'bold',cursor: "pointer" }}>Sign Up here</span></p>
 				
 			</div>
 		</Card>
