@@ -6,6 +6,9 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
+import axios from "axios";
+import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 const validationSchema = yup.object({
 	email: yup
@@ -14,22 +17,38 @@ const validationSchema = yup.object({
 		.required("Email is required"),
 	password: yup
 		.string()
-		.min(8, "Password should be of minimum 8 characters length")
+		.min(6, "Password should be of minimum 8 characters length")
 		.required("Password is required"),
 });
 
 
 const FormModal = () => {
+    const navigate = useNavigate()
 	const formik = useFormik({
 		initialValues: {
-			email: "foobar@example.com",
-			password: "foobar",
+			email: "rabeb_mejri@yahoo.com",
+			password: "123456",
 		},
 		validationSchema: validationSchema,
-		onSubmit: (values) => {
-			alert(JSON.stringify(values, null, 2));
-		},
-	});
+		onSubmit:  async (values) => {
+            try {
+                const response = await axios.post(
+                  "http://localhost:5005/auth/login",
+                  values
+                );
+                console.log("Form submitted successfully:", response.data);
+                const token = response.data.access_token;
+                Cookies.set('token', token)
+                navigate("/home")
+          
+              } catch (error) {
+                console.error("Error submitting form:", error);
+              }
+            },
+		})
+
+	
+    
 
 	return (
         

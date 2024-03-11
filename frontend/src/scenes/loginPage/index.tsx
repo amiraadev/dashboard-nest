@@ -1,10 +1,15 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import Form from "./Form";
 import { ThemeOptions } from "theme";
+import { useState } from "react";
 
 const LoginPage = () => {
 	const theme = useTheme() as ThemeOptions;
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+
+  const [pageType, setPageType] = useState("login");
+  const isLogin = pageType === "login";
+  const isRegister = pageType === "register";
   return (
     <Box>
       <Box
