@@ -16,34 +16,42 @@ interface LoginFormProps {
 }
 
 const validationSchema = yup.object({
+	firstName: yup.string().required("FirstName is required"),
+	lastName: yup.string().required("LastName is required"),
 	email: yup
-		.string()
-		.email("Enter a valid email")
-		.required("Email is required"),
+    .string()
+    .email("Enter a valid email")
+    .required("Email is required"),
 	password: yup
-		.string()
-		.min(6, "Password should be of minimum 8 characters length")
-		.required("Password is required"),
+    .string()
+    .min(6, "Password should be of minimum 8 characters length")
+    .required("Password is required"),
+    location: yup.string(),
+    occupation: yup.string(),
 });
 
 const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 	const navigate = useNavigate();
 	const formik = useFormik({
 		initialValues: {
-			email: "rabeb_mejri@yahoo.com",
+			firstName: "samar",
+			lastName: "yahyawi",
+			email: "samar_yahyawi@yahoo.com",
 			password: "123456",
+			location: "",
+			occupation: "",
 		},
 		validationSchema: validationSchema,
 		onSubmit: async (values) => {
+			// console.log(JSON.stringify(values));
+
 			try {
-				const response = await axios.post(
-					"http://localhost:5005/auth/login",
+				 await axios.post(
+					"http://localhost:5005/auth/register",
 					values
 				);
-				console.log("Form submitted successfully:", response.data);
-				const token = response.data.access_token;
-				Cookies.set("token", token);
-				navigate("/home");
+				// console.log("Form submitted successfully:", response.data);
+				setPageType("login")
 			} catch (error) {
 				console.error("Error submitting form:", error);
 			}
@@ -66,9 +74,14 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 								fullWidth
 								label='First Name'
 								margin='normal'
-								name='fname'
+								id='firstName'
+								name='firstName'
 								type='text'
-								defaultValue=''
+								value={formik.values.firstName}
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+								helperText={formik.touched.firstName && formik.errors.firstName}
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -76,9 +89,14 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 								fullWidth
 								label='Last Name'
 								margin='normal'
-								name='lname'
+								id='lastName'
+								name='lastName'
 								type='text'
-								defaultValue=''
+                                value={formik.values.lastName}
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+								helperText={formik.touched.lastName && formik.errors.lastName}
 							/>
 						</Grid>
 					</Grid>
@@ -107,15 +125,21 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 						helperText={formik.touched.password && formik.errors.password}
 						sx={{ marginBottom: 3 }}
 					/>
-                    <Grid container spacing={2}>
+					<Grid container spacing={2}>
 						<Grid item xs={12} sm={6}>
 							<TextField
 								fullWidth
 								label='Occupation'
 								margin='normal'
-								name='fname'
+								id='occupation'
+								name='occupation'
 								type='text'
-								defaultValue=''
+                                value={formik.values.occupation}
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								error={formik.touched.occupation && Boolean(formik.errors.occupation)}
+								helperText={formik.touched.occupation && formik.errors.occupation}	
+                               
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -123,10 +147,14 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 								fullWidth
 								label='Location'
 								margin='normal'
-								name='lname'
+								id='location'
+								name='location'
 								type='text'
-								defaultValue=''
-							/>
+                                value={formik.values.location}
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								error={formik.touched.location && Boolean(formik.errors.location)}
+								helperText={formik.touched.location && formik.errors.location}							/>
 						</Grid>
 					</Grid>
 					<Button
@@ -140,15 +168,15 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 				</form>
 				<hr />
 				<p>
-					Don't have an account?{" "}
+					Already have an account?{" "}
 					<span
-						onClick={() => setPageType("register")}
+						onClick={() => setPageType("login")}
 						style={{
 							textDecoration: "underline",
 							fontWeight: "bold",
 							cursor: "pointer",
 						}}>
-						Sign Up here
+						Login
 					</span>
 				</p>
 			</div>
