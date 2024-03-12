@@ -35,7 +35,7 @@ const LoginPage = () => {
   
        {isLogin && <LoginForm setPageType={setPageType}/>} 
 
-       {isRegister && <RegisterForm />} 
+       {isRegister && <RegisterForm  setPageType={setPageType}/>} 
       </Box>
     </Box>
   );

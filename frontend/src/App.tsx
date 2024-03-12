@@ -12,7 +12,8 @@ import { themeSettings } from "./theme";
 
 import { StateProps } from "./types";
 import { ThemeMode } from "./theme";
-import ToasterProvider from "providers/ToasterProvider";
+import ToasterProvider from "./providers/ToasterProvider";
+import ProtectedRoutes from "./ProtectedRoutes";
 
 
 function App() {
@@ -27,10 +28,20 @@ function App() {
         <ToasterProvider />
 					<CssBaseline />
 					<Routes>
-						<Route path='/' element={<LoginPage />} />
-						<Route path='/home' element={<HomePage />} />
-						<Route path='/profile/:userId' element={<ProfilePage />} />
+						<Route path='/login' element={<LoginPage />} />
+						{/* <Route path='/home' element={<HomePage />} />
+						<Route path='/profile/:userId' element={<ProfilePage />} /> */}
+
+
+						<Route element={<ProtectedRoutes />}>
+							<Route path='/home' element={<HomePage />} />
+							<Route path='/' element={<HomePage />} />
+							<Route path='/profile/:userId' element={<ProfilePage />} />
+						</Route>
+					
+
 					</Routes>
+          
 				</ThemeProvider>
 			</BrowserRouter>
 		</div>

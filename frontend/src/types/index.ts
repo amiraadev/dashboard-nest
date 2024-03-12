@@ -1,15 +1,23 @@
 /** @format */
 
+// export interface User {
+// 	id: string;
+// 	firstName: string;
+// 	lastName: string;
+// 	email: string;
+	
+// }
 export interface User {
+	id: string;
 	firstName: string;
 	lastName: string;
 	email: string;
 	picturePath?: string;
 	location?: string;
 	occupation?: string;
-	viewedProfile: number;
-	impressions: number;
-	friends: string[];
+	viewedProfile?: number;
+	impressions?: number;
+	friends?: string[];
 }
 
 export interface Post {

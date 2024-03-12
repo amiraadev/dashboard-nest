@@ -7,14 +7,22 @@ import TextField from "@mui/material/TextField";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import axios from "axios";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-
+import { useDispatch } from "react-redux";
+import { jwtDecode } from 'jwt-decode';
+import { setLogin } from "../../state";
 
 interface LoginFormProps {
 	setPageType: (newPageType: string) => void;
-  }
+}
+interface DecodedJwtPayload {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+}
 
 const validationSchema = yup.object({
 	email: yup
@@ -27,38 +35,46 @@ const validationSchema = yup.object({
 		.required("Password is required"),
 });
 
-
 const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
-    const navigate = useNavigate()
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const formik = useFormik({
 		initialValues: {
 			email: "rabeb_mejri@yahoo.com",
 			password: "123456",
 		},
 		validationSchema: validationSchema,
-		onSubmit:  async (values) => {
-            try {
-                const response = await axios.post(
-                  "http://localhost:5005/auth/login",
-                  values
-                );
-                console.log("Form submitted successfully:", response.data);
-                const token = response.data.access_token;
-                Cookies.set('token', token)
+		onSubmit: async (values) => {
+			try {
+				const response = await axios.post(
+					"http://localhost:5005/auth/login",
+					values
+				);
+				console.log("Form submitted successfully:", response.data);
+				const token = response.data.access_token;
+				Cookies.set("token", token);
+				const decoded = jwtDecode<DecodedJwtPayload>(token);
+				const user = {id:decoded.id,
+					firstName:decoded.firstName,
+					lastName:decoded.lastName,
+					email:decoded.email
+				}
+				
+				dispatch(
+					setLogin({
+						user: user,
+						token: token,
+					})
+				);
 				toast.success("Logged in");
-                navigate("/home")
-          
-              } catch (error) {
-                console.error("Error submitting form:", error);
-              }
-            },
-		})
-
-	
-    
+				navigate("/home");
+			} catch (error) {
+				console.error("Error submitting form:", error);
+			}
+		},
+	});
 
 	return (
-        
 		<Card sx={{ padding: 5 }}>
 			<CardHeader
 				title='Welcome back'
@@ -103,8 +119,18 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 					</Button>
 				</form>
 				<hr />
-                <p>Don't have an account? <span onClick={()=>setPageType("register")} style={{ textDecoration: 'underline', fontWeight: 'bold',cursor: "pointer" }}>Sign Up here</span></p>
-				
+				<p>
+					Don't have an account?{" "}
+					<span
+						onClick={() => setPageType("register")}
+						style={{
+							textDecoration: "underline",
+							fontWeight: "bold",
+							cursor: "pointer",
+						}}>
+						Sign Up here
+					</span>
+				</p>
 			</div>
 		</Card>
 	);
