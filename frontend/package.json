@@ -38,6 +38,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.51.0",
+    "react-hot-toast": "^2.4.1",
     "react-pro-sidebar": "^1.1.0",
     "react-redux": "^9.1.0",
     "react-router-dom": "^6.22.3",

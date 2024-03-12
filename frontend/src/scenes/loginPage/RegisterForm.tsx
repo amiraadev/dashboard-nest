@@ -7,8 +7,7 @@ import TextField from "@mui/material/TextField";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import axios from "axios";
-import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import { Grid } from "@mui/material";
 
 interface LoginFormProps {
@@ -19,19 +18,18 @@ const validationSchema = yup.object({
 	firstName: yup.string().required("FirstName is required"),
 	lastName: yup.string().required("LastName is required"),
 	email: yup
-    .string()
-    .email("Enter a valid email")
-    .required("Email is required"),
+		.string()
+		.email("Enter a valid email")
+		.required("Email is required"),
 	password: yup
-    .string()
-    .min(6, "Password should be of minimum 8 characters length")
-    .required("Password is required"),
-    location: yup.string(),
-    occupation: yup.string(),
+		.string()
+		.min(6, "Password should be of minimum 8 characters length")
+		.required("Password is required"),
+	location: yup.string(),
+	occupation: yup.string(),
 });
 
 const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
-	const navigate = useNavigate();
 	const formik = useFormik({
 		initialValues: {
 			firstName: "samar",
@@ -46,12 +44,10 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 			// console.log(JSON.stringify(values));
 
 			try {
-				 await axios.post(
-					"http://localhost:5005/auth/register",
-					values
-				);
+				await axios.post("http://localhost:5005/auth/register", values);
 				// console.log("Form submitted successfully:", response.data);
-				setPageType("login")
+                toast.success("Successfully registered");
+				setPageType("login");
 			} catch (error) {
 				console.error("Error submitting form:", error);
 			}
@@ -80,7 +76,9 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 								value={formik.values.firstName}
 								onChange={formik.handleChange}
 								onBlur={formik.handleBlur}
-								error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+								error={
+									formik.touched.firstName && Boolean(formik.errors.firstName)
+								}
 								helperText={formik.touched.firstName && formik.errors.firstName}
 							/>
 						</Grid>
@@ -92,10 +90,12 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 								id='lastName'
 								name='lastName'
 								type='text'
-                                value={formik.values.lastName}
+								value={formik.values.lastName}
 								onChange={formik.handleChange}
 								onBlur={formik.handleBlur}
-								error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+								error={
+									formik.touched.lastName && Boolean(formik.errors.lastName)
+								}
 								helperText={formik.touched.lastName && formik.errors.lastName}
 							/>
 						</Grid>
@@ -134,12 +134,15 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 								id='occupation'
 								name='occupation'
 								type='text'
-                                value={formik.values.occupation}
+								value={formik.values.occupation}
 								onChange={formik.handleChange}
 								onBlur={formik.handleBlur}
-								error={formik.touched.occupation && Boolean(formik.errors.occupation)}
-								helperText={formik.touched.occupation && formik.errors.occupation}	
-                               
+								error={
+									formik.touched.occupation && Boolean(formik.errors.occupation)
+								}
+								helperText={
+									formik.touched.occupation && formik.errors.occupation
+								}
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -150,11 +153,14 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
 								id='location'
 								name='location'
 								type='text'
-                                value={formik.values.location}
+								value={formik.values.location}
 								onChange={formik.handleChange}
 								onBlur={formik.handleBlur}
-								error={formik.touched.location && Boolean(formik.errors.location)}
-								helperText={formik.touched.location && formik.errors.location}							/>
+								error={
+									formik.touched.location && Boolean(formik.errors.location)
+								}
+								helperText={formik.touched.location && formik.errors.location}
+							/>
 						</Grid>
 					</Grid>
 					<Button

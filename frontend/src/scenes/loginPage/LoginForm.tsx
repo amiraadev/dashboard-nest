@@ -9,6 +9,8 @@ import CardHeader from "@mui/material/CardHeader";
 import axios from "axios";
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+
 
 interface LoginFormProps {
 	setPageType: (newPageType: string) => void;
@@ -43,6 +45,7 @@ const FormModal: React.FC<LoginFormProps> = ({ setPageType }) => {
                 console.log("Form submitted successfully:", response.data);
                 const token = response.data.access_token;
                 Cookies.set('token', token)
+				toast.success("Logged in");
                 navigate("/home")
           
               } catch (error) {

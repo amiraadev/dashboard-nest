@@ -12,6 +12,7 @@ import { themeSettings } from "./theme";
 
 import { StateProps } from "./types";
 import { ThemeMode } from "./theme";
+import ToasterProvider from "providers/ToasterProvider";
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
 		<div className='app'>
 			<BrowserRouter>
 				<ThemeProvider theme={theme}>
+        <ToasterProvider />
 					<CssBaseline />
 					<Routes>
 						<Route path='/' element={<LoginPage />} />
